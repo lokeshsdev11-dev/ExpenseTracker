@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Income Expense Calculator</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      .summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 30px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      }
+
+      .summary-card {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .summary-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .summary-card h3 {
+        font-size: 0.9em;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      .summary-card p {
+        font-size: 2em;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .summary-card.income p {
+        color: #4caf50;
+      }
+
+      .summary-card.expense p {
+        color: #f44336;
+      }
+
+      .summary-card.balance p {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .form-section {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-section h2 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+      }
+
+      .form-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .input-wrapper {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .input-wrapper label {
+        font-size: 0.9em;
+        color: #555;
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+
+      .input-wrapper input,
+      .input-wrapper select {
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: all 0.3s ease;
+        background: white;
+      }
+
+      .input-wrapper input:focus,
+      .input-wrapper select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 10px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .btn-add {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        flex: 1;
+      }
+
+      .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+      }
+
+      .btn-update {
+        background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        color: white;
+        flex: 1;
+      }
+
+      .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+      }
+
+      .btn-reset {
+        background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+        color: white;
+      }
+
+      .btn-reset:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(158, 158, 158, 0.4);
+      }
+
+      .filter-section {
+        margin-bottom: 25px;
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .filter-section h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+      }
+
+      .filter-options {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .radio-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 8px 16px;
+        background: white;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+      }
+
+      .radio-wrapper:hover {
+        transform: scale(1.05);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .radio-wrapper input[type="radio"] {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+      }
+
+      .radio-wrapper label {
+        cursor: pointer;
+        font-weight: 600;
+        color: #555;
+        text-transform: capitalize;
+      }
+
+      .entries-section h2 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+      }
+
+      .entries-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .entry-item {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-left: 5px solid;
+      }
+
+      .entry-item.income {
+        border-left-color: #4caf50;
+        background: linear-gradient(135deg, #ffffff 0%, #e8f5e9 100%);
+      }
+
+      .entry-item.expense {
+        border-left-color: #f44336;
+        background: linear-gradient(135deg, #ffffff 0%, #ffebee 100%);
+      }
+
+      .entry-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .entry-details {
+        flex: 1;
+      }
+
+      .entry-description {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .entry-type {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .entry-type.income {
+        background: #4caf50;
+        color: white;
+      }
+
+      .entry-type.expense {
+        background: #f44336;
+        color: white;
+      }
+
+      .entry-amount {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin: 0 20px;
+      }
+
+      .entry-amount.income {
+        color: #4caf50;
+      }
+
+      .entry-amount.expense {
+        color: #f44336;
+      }
+
+      .entry-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-edit,
+      .btn-delete {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-edit {
+        background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        color: white;
+      }
+
+      .btn-edit:hover {
+        transform: scale(1.1);
+        box-shadow: 0 3px 10px rgba(33, 150, 243, 0.4);
+      }
+
+      .btn-delete {
+        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        color: white;
+      }
+
+      .btn-delete:hover {
+        transform: scale(1.1);
+        box-shadow: 0 3px 10px rgba(244, 67, 54, 0.4);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+      }
+
+      .empty-state svg {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        opacity: 0.3;
+      }
+
+      .empty-state h3 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+      }
+
+      .empty-state p {
+        font-size: 1.1em;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+
+        .header h1 {
+          font-size: 1.8em;
+        }
+
+        .summary {
+          padding: 20px;
+          gap: 15px;
+        }
+
+        .summary-card p {
+          font-size: 1.5em;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .form-section,
+        .filter-section {
+          padding: 20px;
+        }
+
+        .form-group {
+          grid-template-columns: 1fr;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        .entry-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 15px;
+        }
+
+        .entry-amount {
+          margin: 0;
+        }
+
+        .entry-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>💰 Income Expense Calculator</h1>
+        <p>Track your finances with ease</p>
+      </div>
+
+      <div class="summary">
+        <div class="summary-card income">
+          <h3>Total Income</h3>
+          <p id="totalIncome">$0.00</p>
+        </div>
+        <div class="summary-card expense">
+          <h3>Total Expenses</h3>
+          <p id="totalExpense">$0.00</p>
+        </div>
+        <div class="summary-card balance">
+          <h3>Net Balance</h3>
+          <p id="netBalance">$0.00</p>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="form-section">
+          <h2>Add New Entry</h2>
+          <div class="form-group">
+            <div class="input-wrapper">
+              <label for="description">Description</label>
+              <input type="text" id="description" placeholder="Enter description" required>
+            </div>
+            <div class="input-wrapper">
+              <label for="amount">Amount ($)</label>
+              <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" required>
+            </div>
+            <div class="input-wrapper">
+              <label for="type">Type</label>
+              <select id="type" required>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn-add" id="addBtn">Add Entry</button>
+            <button class="btn-update hidden" id="updateBtn">Update Entry</button>
+            <button class="btn-reset" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <h3>Filter Entries</h3>
+          <div class="filter-options">
+            <div class="radio-wrapper">
+              <input type="radio" id="filterAll" name="filter" value="all" checked>
+              <label for="filterAll">All</label>
+            </div>
+            <div class="radio-wrapper">
+              <input type="radio" id="filterIncome" name="filter" value="income">
+              <label for="filterIncome">Income</label>
+            </div>
+            <div class="radio-wrapper">
+              <input type="radio" id="filterExpense" name="filter" value="expense">
+              <label for="filterExpense">Expense</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="entries-section">
+          <h2>Entries List</h2>
+          <div class="entries-list" id="entriesList">
+            <div class="empty-state">
+              <h3>No entries yet</h3>
+              <p>Start by adding your first income or expense entry above</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let entries = [];
+      let editingId = null;
+      let currentFilter = 'all';
+
+      const descriptionInput = document.getElementById('description');
+      const amountInput = document.getElementById('amount');
+      const typeSelect = document.getElementById('type');
+      const addBtn = document.getElementById('addBtn');
+      const updateBtn = document.getElementById('updateBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const entriesList = document.getElementById('entriesList');
+      const totalIncomeEl = document.getElementById('totalIncome');
+      const totalExpenseEl = document.getElementById('totalExpense');
+      const netBalanceEl = document.getElementById('netBalance');
+      const filterRadios = document.querySelectorAll('input[name="filter"]');
+
+      function loadFromLocalStorage() {
+        const stored = localStorage.getItem('incomeExpenseEntries');
+        if (stored) {
+          entries = JSON.parse(stored);
+        }
+      }
+
+      function saveToLocalStorage() {
+        localStorage.setItem('incomeExpenseEntries', JSON.stringify(entries));
+      }
+
+      function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+      }
+
+      function resetForm() {
+        descriptionInput.value = '';
+        amountInput.value = '';
+        typeSelect.value = 'income';
+        editingId = null;
+        addBtn.classList.remove('hidden');
+        updateBtn.classList.add('hidden');
+      }
+
+      function calculateSummary() {
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        entries.forEach(entry => {
+          if (entry.type === 'income') {
+            totalIncome += entry.amount;
+          } else {
+            totalExpense += entry.amount;
+          }
+        });
+
+        const netBalance = totalIncome - totalExpense;
+
+        totalIncomeEl.textContent = `$${totalIncome.toFixed(2)}`;
+        totalExpenseEl.textContent = `$${totalExpense.toFixed(2)}`;
+        netBalanceEl.textContent = `$${netBalance.toFixed(2)}`;
+      }
+
+      function renderEntries() {
+        const filteredEntries = currentFilter === 'all'
+          ? entries
+          : entries.filter(entry => entry.type === currentFilter);
+
+        if (filteredEntries.length === 0) {
+          entriesList.innerHTML = `
+            <div class="empty-state">
+              <h3>No ${currentFilter === 'all' ? '' : currentFilter} entries found</h3>
+              <p>${currentFilter === 'all' ? 'Start by adding your first income or expense entry above' : `Add some ${currentFilter} entries to see them here`}</p>
+            </div>
+          `;
+          return;
+        }
+
+        entriesList.innerHTML = filteredEntries.map(entry => `
+          <div class="entry-item ${entry.type}">
+            <div class="entry-details">
+              <div class="entry-description">${entry.description}</div>
+              <span class="entry-type ${entry.type}">${entry.type}</span>
+            </div>
+            <div class="entry-amount ${entry.type}">
+              ${entry.type === 'income' ? '+' : '-'}$${entry.amount.toFixed(2)}
+            </div>
+            <div class="entry-actions">
+              <button class="btn-edit" onclick="editEntry('${entry.id}')">Edit</button>
+              <button class="btn-delete" onclick="deleteEntry('${entry.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function addEntry() {
+        const description = descriptionInput.value.trim();
+        const amount = parseFloat(amountInput.value);
+        const type = typeSelect.value;
+
+        if (!description || !amount || amount <= 0) {
+          alert('Please enter valid description and amount');
+          return;
+        }
+
+        const newEntry = {
+          id: generateId(),
+          description,
+          amount,
+          type,
+          date: new Date().toISOString()
+        };
+
+        entries.unshift(newEntry);
+        saveToLocalStorage();
+        calculateSummary();
+        renderEntries();
+        resetForm();
+      }
+
+      function editEntry(id) {
+        const entry = entries.find(e => e.id === id);
+        if (!entry) return;
+
+        descriptionInput.value = entry.description;
+        amountInput.value = entry.amount;
+        typeSelect.value = entry.type;
+        editingId = id;
+
+        addBtn.classList.add('hidden');
+        updateBtn.classList.remove('hidden');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function updateEntry() {
+        const description = descriptionInput.value.trim();
+        const amount = parseFloat(amountInput.value);
+        const type = typeSelect.value;
+
+        if (!description || !amount || amount <= 0) {
+          alert('Please enter valid description and amount');
+          return;
+        }
+
+        const entryIndex = entries.findIndex(e => e.id === editingId);
+        if (entryIndex === -1) return;
+
+        entries[entryIndex] = {
+          ...entries[entryIndex],
+          description,
+          amount,
+          type
+        };
+
+        saveToLocalStorage();
+        calculateSummary();
+        renderEntries();
+        resetForm();
+      }
+
+      function deleteEntry(id) {
+        if (!confirm('Are you sure you want to delete this entry?')) return;
+
+        entries = entries.filter(e => e.id !== id);
+        saveToLocalStorage();
+        calculateSummary();
+        renderEntries();
+      }
+
+      function handleFilterChange(e) {
+        currentFilter = e.target.value;
+        renderEntries();
+      }
+
+      addBtn.addEventListener('click', addEntry);
+      updateBtn.addEventListener('click', updateEntry);
+      resetBtn.addEventListener('click', resetForm);
+      filterRadios.forEach(radio => {
+        radio.addEventListener('change', handleFilterChange);
+      });
+
+      descriptionInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          if (editingId) {
+            updateEntry();
+          } else {
+            addEntry();
+          }
+        }
+      });
+
+      amountInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          if (editingId) {
+            updateEntry();
+          } else {
+            addEntry();
+          }
+        }
+      });
+
+      loadFromLocalStorage();
+      calculateSummary();
+      renderEntries();
+    </script>
+  </body>
+</html>
